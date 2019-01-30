@@ -1,4 +1,5 @@
 {# src/OC/PlatformBundle/Resources/view/Advert/view.html.twig #}
+{#
 <!DOCTYPE html>
 <html>
 
@@ -7,11 +8,11 @@
   </head>
 
   <body>
-    {#
+    
     <h1>Hello {{ nom }} !</h1>   
-    #}
+    
 
-    {#
+    
     <a href="{{ path('oc_platform_view', { 'id': advert_id }) }}">
       Lien vers l'annonce d'id {{ advert_id }}
     </a> 
@@ -19,10 +20,16 @@
     <a href="{{ path('oc_platform_view', { 'id': redirect_id }) }}">
       Lien vers l'annonce d'id {{ redirect_id }}
     </a> 
-    #}
-
-    <h1>Bienvenue sur ma première page avec OpenClassrooms !</h1>  
+         
 
   </body>
 
+  <footer>Responsable du site : {{ webmaster }}.</footer>
+
 </html>
+#}
+{% extends "OCPlatformBundle::layout.html.twig" %}
+{% block title %}{{ parent() }} - Index{% endblock %}
+{% block body %}
+  Notre plateforme est un peu vide pour le moment, mais cela viendra !
+{% endblock %} 
