@@ -1,35 +1,27 @@
-{# src/OC/PlatformBundle/Resources/view/Advert/view.html.twig #}
-{#
-<!DOCTYPE html>
-<html>
+{# src/OC/PlatformBundle/Resources/views/Advert/index.html.twig #}
 
-  <head>
-    <title>Bienvenue sur ma première page avec OpenClassrooms !</title>
-  </head>
-
-  <body>
-    
-    <h1>Hello {{ nom }} !</h1>   
-    
-
-    
-    <a href="{{ path('oc_platform_view', { 'id': advert_id }) }}">
-      Lien vers l'annonce d'id {{ advert_id }}
-    </a> 
-    <br/>
-    <a href="{{ path('oc_platform_view', { 'id': redirect_id }) }}">
-      Lien vers l'annonce d'id {{ redirect_id }}
-    </a> 
-         
-
-  </body>
-
-  <footer>Responsable du site : {{ webmaster }}.</footer>
-
-</html>
-#}
 {% extends "OCPlatformBundle::layout.html.twig" %}
-{% block title %}{{ parent() }} - Index{% endblock %}
-{% block body %}
-  Notre plateforme est un peu vide pour le moment, mais cela viendra !
-{% endblock %} 
+
+{% block title %}
+  Accueil - {{ parent() }}
+{% endblock %}
+
+{% block ocplatform_body %}
+
+  <h2>Liste des annonces</h2>
+
+  <ul>
+    {% for advert in listAdverts %}
+      <li>
+        <a href="{{ path('oc_platform_view', {'id': advert.id}) }}">
+          {{ advert.title }}
+        </a>
+        par {{ advert.author }},
+        le {{ advert.date|date('d/m/Y') }}
+      </li>
+    {% else %}
+      <li>Pas (encore !) d'annonces</li>
+    {% endfor %}
+  </ul>
+
+{% endblock %}
