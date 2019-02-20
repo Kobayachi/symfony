@@ -35,6 +35,9 @@ class AdvertController extends Controller
             ),
         );
 
+        // On a donc accès au conteneur :
+        $mailer = $this->container->get('mailer');
+
         // Et modifiez le 2nd argument pour injecter notre liste
         return $this->render('OCPlatformBundle:Advert:index.html.twig', array(
             'listAdverts' => $listAdverts,
@@ -59,6 +62,15 @@ class AdvertController extends Controller
 
     public function addAction(Request $request)
     {
+        // On récupère le service
+        $antispam = $this->container->get('oc_platform.antispam');
+        // Je pars du principe que $text contient le texte d'un message quelconque
+        $text = '...';
+        if ($antispam->isSpam($text)) {
+            throw new \Exception('Votre message a été détecté comme spam !');
+        }
+
+        // Ici le message n'est pas un spam
         // La gestion d'un formulaire est particulière, mais l'idée est la suivante :
         // Si la requête est en POST, c'est que le visiteur a soumis le formulaire
         if ($request->isMethod('POST')) {
