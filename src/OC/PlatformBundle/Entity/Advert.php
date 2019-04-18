@@ -1,4 +1,5 @@
 <?php
+// src/OC/PlatformBundle/Entity/Advert.php
 
 namespace OC\PlatformBundle\Entity;
 
@@ -53,6 +54,13 @@ class Advert
      * @ORM\Column(name="published", type="boolean")
      */
     private $published = true;
+
+    /**
+     *
+     * @ORM\OneToOne(targetEntity="OC\PlatformBundle\Entity\Image", cascade={"persist"})
+     *
+     */
+    private $image;
 
     public function __construct()
     {
@@ -188,5 +196,30 @@ class Advert
     public function getPublished()
     {
         return $this->published;
+    }
+
+
+    /**
+     * Set image.
+     *
+     * @param \OC\PlatformBundle\Entity\Image|null $image
+     *
+     * @return Advert
+     */
+    public function setImage(\OC\PlatformBundle\Entity\Image $image = null)
+    {
+        $this->image = $image;
+
+        return $this;
+    }
+
+    /**
+     * Get image.
+     *
+     * @return \OC\PlatformBundle\Entity\Image|null
+     */
+    public function getImage()
+    {
+        return $this->image;
     }
 }
