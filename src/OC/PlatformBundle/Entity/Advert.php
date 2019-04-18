@@ -65,7 +65,7 @@ class Advert
 
     /**
      * @ORM\ManyToMany(targetEntity="OC\PlatformBundle\Entity\Category", cascade={"persist"})
-     * @ORM\JoinTable(name="oc_advert_category")
+     * @ORM\JoinTable(name="advert_category")
      */
     private $categories;
 

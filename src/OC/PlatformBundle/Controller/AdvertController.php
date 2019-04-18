@@ -4,6 +4,7 @@ namespace OC\PlatformBundle\Controller;
 
 use OC\PlatformBundle\Entity\Advert;
 use OC\PlatformBundle\Entity\Image;
+use OC\PlatformBundle\Entity\Application;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -102,10 +103,10 @@ class AdvertController extends Controller
         // On récupère l'annonce d'id 5. On n'a pas encore vu cette méthode find(),
         // mais elle est simple à comprendre. Pas de panique, on la voit en détail
         // dans un prochain chapitre dédié aux repositories
-        $advert2 = $em->getRepository('OCPlatformBundle:Advert')->find(5);
+        //$advert2 = $em->getRepository('OCPlatformBundle:Advert')->find(5);
 
         // On modifie cette annonce, en changeant la date à la date d'aujourd'hui
-        $advert2->setDate(new \Datetime());
+        //$advert2->setDate(new \Datetime());
 
         // Ici, pas besoin de faire un persist() sur $advert2. En effet, comme on a
         // récupéré cette annonce via Doctrine, il sait déjà qu'il doit gérer cette
@@ -172,6 +173,29 @@ class AdvertController extends Controller
 
     public function editAction($id, Request $request)
     {
+        $em = $this->getDoctrine()->getManager();
+
+        // On récupère l'annonce $id
+        $advert = $em->getRepository('OCPlatformBundle:Advert')->find($id);
+
+        if (null === $advert) {
+            throw new NotFoundHttpException("L'annonce d'id " . $id . " n'existe pas.");
+        }
+
+        // La méthode findAll retourne toutes les catégories de la base de données
+        $listCategories = $em->getRepository('OCPlatformBundle:Category')->findAll();
+
+        // On boucle sur les catégories pour les lier à l'annonce
+        foreach ($listCategories as $category) {
+            $advert->addCategory($category);
+        }
+
+        // Pour persister le changement dans la relation, il faut persister l'entité propriétaire
+        // Ici, Advert est le propriétaire, donc inutile de la persister car on l'a récupérée depuis Doctrine
+
+        // Étape 2 : On déclenche l'enregistrement
+        $em->flush();
+
         // Ici, on récupérera l'annonce correspondante à $id
         // Même mécanisme que pour l'ajout
         $advert = array(
@@ -189,6 +213,26 @@ class AdvertController extends Controller
 
     public function deleteAction($id)
     {
+        $em = $this->getDoctrine()->getManager();
+
+        // On récupère l'annonce $id
+        $advert = $em->getRepository('OCPlatformBundle:Advert')->find($id);
+
+        if (null === $advert) {
+            throw new NotFoundHttpException("L'annonce d'id " . $id . " n'existe pas.");
+        }
+
+        // On boucle sur les catégories de l'annonce pour les supprimer
+        foreach ($advert->getCategories() as $category) {
+            $advert->removeCategory($category);
+        }
+
+        // Pour persister le changement dans la relation, il faut persister l'entité propriétaire
+        // Ici, Advert est le propriétaire, donc inutile de la persister car on l'a récupérée depuis Doctrine
+
+        // On déclenche la modification
+        $em->flush();
+
         // Ici, on récupérera l'annonce correspondant à $id
         // Ici, on gérera la suppression de l'annonce en question
         return $this->render('OCPlatformBundle:Advert:delete.html.twig');
