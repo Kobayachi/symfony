@@ -3,8 +3,8 @@
 {% block title %}
     Lecture d'une annonce -
     {{ parent() }}
-{% endblock %}
-{% block ocplatform_body %}
+    {% endblock %}
+    {% block ocplatform_body %}
     {% if advert.image is not null %}
         <img src="{{ advert.image.url }}" alt="{{ advert.image.alt }}">
     {% endif %}
@@ -21,17 +21,28 @@
     </div>
     <p>
         <a href="{{ path('oc_platform_home') }}" class="btn btn-default">
-            <i class="glyphicon glyphicon-chevron-left"></i>
-            Retour à la liste
+        <i class="glyphicon glyphicon-chevron-left"></i>
+        Retour à la liste
         </a>
         <a href="{{ path('oc_platform_edit', {'id': advert.id}) }}" class="btn btn-default">
-            <i class="glyphicon glyphicon-edit"></i>
-            Modifier l'annonce
+        <i class="glyphicon glyphicon-edit"></i>
+        Modifier l'annonce
         </a>
         <a href="{{ path('oc_platform_delete', {'id': advert.id}) }}" class="btn btn-danger">
-            <i class="glyphicon glyphicon-trash"></i>
-            Supprimer l'annonce
+        <i class="glyphicon glyphicon-trash"></i>
+        Supprimer l'annonce
         </a>
     </p>
-    {# On vérifie qu'une image soit bien associée à l'annonce #}   
+    {# On vérifie qu'une image soit bien associée à l'annonce #}
+
+    {% if not advert.categories.empty %}
+        <p>
+        Cette annonce est parue dans les catégories suivantes :
+        {% for category in advert.categories %}
+            {{ category.name }}
+            {% if not loop.last %},
+            {% endif %}
+        {% endfor %}
+        </p>
+    {% endif %}
 {% endblock %}
