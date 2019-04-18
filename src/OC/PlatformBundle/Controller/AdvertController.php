@@ -48,26 +48,24 @@ class AdvertController extends Controller
 
     public function viewAction($id, Request $request)
     {
-        // On récupère le repository
-        $repository = $this->getDoctrine()
-            ->getManager()
-            ->getRepository('OCPlatformBundle:Advert')
-        ;
+        $em = $this->getDoctrine()->getManager();
 
-        // On récupère l'entité correspondante à l'id $id
-        $advert = $repository->find($id);
+        // On récupère l'annonce $id
+        $advert = $em->getRepository('OCPlatformBundle:Advert')->find($id);
 
-        // $advert est donc une instance de OC\PlatformBundle\Entity\Advert
-        // ou null si l'id $id  n'existe pas, d'où ce if :
         if (null === $advert) {
             throw new NotFoundHttpException("L'annonce d'id " . $id . " n'existe pas.");
         }
 
-        // Le render ne change pas, on passait avant un tableau, maintenant un objet
-        return $this->render('OCPlatformBundle:Advert:view.html.twig', array(
-            'advert' => $advert,
-        ));
+        // On récupère la liste des candidatures de cette annonce
+        $listApplications = $em
+            ->getRepository('OCPlatformBundle:Application')
+            ->findBy(array('advert' => $advert));
 
+        return $this->render('OCPlatformBundle:Advert:view.html.twig', array(
+            'advert'           => $advert,
+            'listApplications' => $listApplications
+        ));
     }
 
     public function addAction(Request $request)
@@ -79,6 +77,7 @@ class AdvertController extends Controller
         $advert->setContent("Nous recherchons un développeur Symfony débutant sur Lyon. Blabla…");
         // On peut ne pas définir ni la date ni la publication,
         // car ces attributs sont définis automatiquement dans le constructeur
+
 
         // Création de l'entité Image
         $image = new Image();
@@ -116,6 +115,35 @@ class AdvertController extends Controller
         // Enfin, on applique les deux changements à la base de données :
         // Un INSERT INTO pour ajouter $advert1
         // Et un UPDATE pour mettre à jour la date de $advert2
+        // Étape 2 : On « flush » tout ce qui a été persisté avant
+        $em->flush();
+
+
+        // Création d'une première candidature
+        $application1 = new Application();
+        $application1->setAuthor('Marine');
+        $application1->setContent("J'ai toutes les qualités requises.");
+
+        // Création d'une deuxième candidature par exemple
+        $application2 = new Application();
+        $application2->setAuthor('Pierre');
+        $application2->setContent("Je suis très motivé.");
+
+        // On lie les candidatures à l'annonce
+        $application1->setAdvert($advert);
+        $application2->setAdvert($advert);
+
+        // On récupère l'EntityManager
+        $em = $this->getDoctrine()->getManager();
+
+        // Étape 1 : On « persiste » l'entité
+        $em->persist($advert);
+
+        // Étape 1 ter : pour cette relation pas de cascade lorsqu'on persiste Advert, car la relation est
+        // définie dans l'entité Application et non Advert. On doit donc tout persister à la main ici.
+        $em->persist($application1);
+        $em->persist($application2);
+
         // Étape 2 : On « flush » tout ce qui a été persisté avant
         $em->flush();
 
@@ -209,5 +237,4 @@ class AdvertController extends Controller
         $em->flush();
         return new Response('OK');
     }
-
 }
